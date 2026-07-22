@@ -1,0 +1,69 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   polish.css — de-jank + fluidez (2026-07-22)
+   Cargado DESPUÉS de main.css/custom.css. Overrides mínimos; el resto queda igual.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Scroll nativo (se removió SmoothScrollbar) ─────────────────────────────
+   main.css dejaba body/main/#page-scroll con overflow:hidden + alturas fijas
+   (100vh/100vw) porque el scroll lo emulaba SmoothScrollbar por transform. Al
+   volver a scroll nativo, liberamos esos contenedores para que el documento
+   crezca y scrollee de forma natural (sin damping, sin saltos). */
+html { height: auto; scroll-behavior: smooth; }
+body { overflow-x: hidden !important; overflow-y: auto !important; height: auto !important; }
+#page-scroll { width: auto !important; height: auto !important; min-height: 100vh; overflow: visible !important; }
+.page-cover,
+.barba-wrapper,
+main.onepage { overflow: visible !important; }
+
+/* Respeta a quien prefiere menos movimiento */
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* ── Header: barra fija real al viewport ────────────────────────────────────
+   Antes se reposicionaba por JS cada frame (fixed.style.top = offset.y) porque
+   estaba dentro de .page-wrapper (backdrop-filter = containing block). Ya lo
+   movimos a nivel body, así que un position:fixed limpio se ancla al viewport. */
+header#fixed {
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  left: auto !important;
+}
+
+/* Los anclas de navegación caen debajo del header fijo, no detrás de él. */
+.page-wrapper [id],
+section[id] { scroll-margin-top: 96px; }
+
+/* ── nav-extras: barra superior, no flotando a media pantalla ────────────────
+   El header#fixed es una columna angosta (~89px) y alta (~327px) a la derecha;
+   .nav-extras estaba centrado (top:50%) → caía a ~y163 y se salía a la izquierda.
+   Lo fijamos arriba, alineado con el botón de menú. */
+.nav-extras {
+  top: 12px !important;
+  transform: none !important;
+  /* fondo sutil: el contenido scrollea por detrás sin ensuciar los botones */
+  background: rgba(10, 10, 10, 0.55);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  padding: 6px 10px;
+  border-radius: 10px;
+}
+
+/* ── Ritmo vertical: recortar el espaciado excesivo entre secciones ──────────
+   El template separa secciones con spacers fijos; se sentían huecos grandes. */
+.spacer-75 { height: 40px !important; }
+.spacer-60 { height: 32px !important; }
+.spacer-45 { height: 26px !important; }
+.spacer-30 { height: 18px !important; }
+
+/* ── CLS: reservar la caja del radar de skills ──────────────────────────────
+   El <canvas> arranca 300×150 y Chart.js lo reescala a ~300×300 al cargar,
+   empujando el contenido ~150px. Reservamos la altura para que no salte. */
+.radar-wrap { height: 300px; min-height: 300px; }
+
+/* ── Repintados más baratos: bajar blur excesivo ────────────────────────────
+   blur(30px) en un panel fijo grande es caro. 12px se ve casi igual sobre un
+   fondo ya oscurecido, y abarata el scroll. */
+.page-wrapper {
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}

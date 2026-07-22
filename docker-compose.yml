@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: serguicv-portfolio
+    container_name: serguicv_app
+    restart: unless-stopped
+    expose:
+      - "80"
+    ports:
+      - "9081:80"
+    environment:
+      APP_ENV: production
+      APP_DEBUG: false
+      APP_URL: ${APP_URL:-http://localhost}
+      APP_KEY: ${APP_KEY}
+      APP_LOCALE: ${APP_LOCALE:-es}
+      MAIL_MAILER: ${MAIL_MAILER:-smtp}
+      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_ENCRYPTION: ${MAIL_ENCRYPTION:-tls}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-"Sergio Troche Portfolio"}
+      MAIL_PORTFOLIO_RECIPIENT: ${MAIL_PORTFOLIO_RECIPIENT}
+      CACHE_DRIVER: redis
+      SESSION_DRIVER: file
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      LOG_CHANNEL: stderr
+      LOG_LEVEL: error
+      SENTRY_LARAVEL_DSN: ${SENTRY_LARAVEL_DSN:-}
+      GIT_COMMIT: ${GIT_COMMIT:-unknown}
+      # serguicv es web-only (portafolio Laravel sin BD real); sqlite evita
+      # depender de un servidor MySQL. La app no ejecuta migraciones ni consultas.
+      DB_CONNECTION: sqlite
+      # ── Ecosistema Kapitalya ───────────────────────────────────────────
+      TROMAY_INTERNAL_URL: ${TROMAY_INTERNAL_URL:-http://tromay_app:80}
+      TROMAY_URL: ${TROMAY_URL:-https://kapitalya.com.bo}
+      FINDEMPROAI_URL: ${FINDEMPROAI_URL:-https://app.kapitalya.com.bo}
+      FINDEMPROLAREOS_URL: ${FINDEMPROLAREOS_URL:-https://lacteos.kapitalya.com.bo}
+      FOREX_URL: ${FOREX_URL:-https://forex.kapitalya.com.bo}
+      ALERTAS_URL: ${ALERTAS_URL:-https://alertas.kapitalya.com.bo}
+      OPEN_TO_WORK: ${OPEN_TO_WORK:-true}
+      # ── Monetización (dormido si vacío) ────────────────────────────────
+      ADSENSE_CLIENT: ${ADSENSE_CLIENT:-}
+      ADSENSE_SLOT: ${ADSENSE_SLOT:-}
+      GA_MEASUREMENT_ID: ${GA_MEASUREMENT_ID:-}
+    volumes:
+      - storage_data:/var/www/html/storage
+      - ./public/cv:/var/www/html/public/cv
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - serguicv_net
+      - kapitalya-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: serguicv_redis
+    restart: unless-stopped
+    expose:
+      - "6379"
+    command: >
+      redis-server
+      --maxmemory 64mb
+      --maxmemory-policy allkeys-lru
+      --save ""
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - serguicv_net
+
+volumes:
+  storage_data:
+
+networks:
+  serguicv_net:
+    driver: bridge
+  kapitalya-net:
+    external: true

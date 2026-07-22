@@ -1,0 +1,96 @@
+/* Kapitalya Design System */
+:root {
+  --kap-primary: #1a1f3a;
+  --kap-primary-light: #2e3a6e;
+  --kap-gold: #f59e0b;
+  --kap-gold-hover: #d97706;
+  --kap-surface: #ffffff;
+  --kap-surface-2: #f8fafc;
+  --kap-text: #1a1f3a;
+  --kap-text-muted: #64748b;
+  --kap-border: #e2e8f0;
+  --kap-radius: 8px;
+  --kap-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  --kap-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+  --transition: 0.2s ease;
+}
+
+/* Smooth scroll y base */
+html { scroll-behavior: smooth; }
+*, *::before, *::after { box-sizing: border-box; }
+
+/* Focus visible accesible */
+:focus-visible {
+  outline: 2px solid var(--kap-gold);
+  outline-offset: 2px;
+}
+
+/* Botones mejorados */
+.btn, button[type="submit"], .btn-primary {
+  transition: background-color var(--transition), transform var(--transition), box-shadow var(--transition);
+  cursor: pointer;
+}
+.btn:hover, .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--kap-shadow-lg);
+}
+.btn:active { transform: translateY(0); }
+
+/* Links */
+a { transition: color var(--transition), opacity var(--transition); }
+
+/* Cards */
+.card {
+  background: var(--kap-surface);
+  border-radius: var(--kap-radius);
+  box-shadow: var(--kap-shadow);
+  border: 1px solid var(--kap-border);
+}
+
+/* Skeleton loading */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.skeleton {
+  background: var(--kap-border);
+  border-radius: 4px;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--kap-surface-2); }
+::-webkit-scrollbar-thumb { background: var(--kap-primary-light); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--kap-primary); }
+
+/* ── Skeleton shimmer variants ───────────────────────────── */
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton-row {
+  height: 40px; border-radius: 4px; margin-bottom: 8px;
+  background: linear-gradient(90deg, var(--kap-border,#e2e8f0) 25%, rgba(255,255,255,0.5) 50%, var(--kap-border,#e2e8f0) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+.skeleton-text { height: 16px; border-radius: 4px; margin-bottom: 6px; }
+.skeleton-card { height: 80px; border-radius: 8px; margin-bottom: 12px; }
+
+/* ── Touch targets mínimos para CV ───────────────────────── */
+nav a, .btn, button, [role="button"], .social-link, .portfolio-item a {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Print para CV */
+@media print {
+  nav, footer, .no-print { display: none !important; }
+  body { font-size: 12pt; color: #000; background: white; }
+  a { text-decoration: none; color: #000; }
+  .card { box-shadow: none; border: 1px solid #ddd; }
+}
